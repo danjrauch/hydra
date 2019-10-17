@@ -1,0 +1,13 @@
+[package]
+name = "hydra"
+version = "0.1.0"
+authors = ["Dan Rauch <drauch@hawk.iit.edu>"]
+edition = "2018"
+
+[build-dependencies]
+lalrpop = "0.17.2"
+
+[dependencies]
+lazy_static = "1.4.0"
+lalrpop-util = "0.17.2"
+regex = "0.2.1"
