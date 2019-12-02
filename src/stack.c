@@ -6,18 +6,6 @@
 #define LOW_4(x) (((x) << 32) >> 32)
 #define HIGH_4(x) ((x) >> 32)
 
-void print_bin(u8 n){
-  while (n) {
-    if (n & 1)
-        printf("1");
-    else
-        printf("0");
-
-    n >>= 1;
-  }
-  printf("\n");
-}
-
 typedef struct cell {
   value val;
   struct cell * prev;

@@ -1,1 +1,1 @@
-4 9 * 4 + 8 - 8 / 4 / ." done now"
+: mult -2 -3 * ; : add -10 2 + ; mult add

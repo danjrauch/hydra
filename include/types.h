@@ -33,6 +33,13 @@ typedef struct value {
   int t;
 } value;
 
+#define TYPE_LABEL(t) \
+    ( t==T_u4 ? "u4" \
+    : t==T_u8 ? "u8" \
+    : t==T_i4 ? "i4" \
+    : t==T_i8 ? "i8" \
+    : 0 )
+
 #define CAST(v, t) \
     ( t==T_u4 ? (u4) v \
     : t==T_u8 ? (u8) v \

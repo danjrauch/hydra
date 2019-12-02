@@ -17,7 +17,7 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
-CFLAGS ?= -c -Wall -Iinclude
+CFLAGS ?= -c -Iinclude -Wall
 
 # Using Criterion as a test framework
 # https://github.com/Snaipe/Criterion

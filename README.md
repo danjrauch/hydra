@@ -1,21 +1,15 @@
 hydra
 ======
-Forth interpreter.
+Forth virtual machine.
 
 ## Download
 * [Version 0.0.1] Clone the repo.
 
 ## Usage
-```
 
-```
 
-## Core Namespace
-* *
-* /
-* +
-* -
-* ."
+## Namespaces
+* Core [:, .", *, /, +, -, 1+]
 
 ## Contributors
 
@@ -27,3 +21,13 @@ Forth interpreter.
 
 ## Version 
 * Version 0.0.1
+
+## Examples
+
+```
+4 9 * 4 + 8 - 8 / 4 / ." done now"
+```
+
+```
+: mult 2 3 * ; : add 1 2 + ; add mult
+```
