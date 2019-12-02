@@ -6,6 +6,7 @@
 #include <hashmap.h>
 #include <types.h>
 #include <stack.h>
+#include <space.h>
 
 u4 new_type(u4 a_type, u4 b_type){
   u4 min_type = min(a_type, b_type);
@@ -20,7 +21,7 @@ u4 new_type(u4 a_type, u4 b_type){
 
 /* ( n1 | u1 n2 | u2 -- n3 | u3 )
  * Multiply n1 | u1 by n2 | u2 giving the product n3 | u3. */
-u4 multiply(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 multiply(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 2){
     printf("The stack is too small to multiply. Exiting.\n");
     exit(0);
@@ -35,7 +36,7 @@ u4 multiply(struct stack * s, char ** p_string, int pc, map_t ns){
 
 /* ( n1 n2 -- n3 )
  * Divide n1 by n2, giving the single-cell quotient n3. An ambiguous condition exists if n2 is zero. */
-u4 divide(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 divide(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 2){
     printf("The stack is too small to divide. Exiting.\n");
     exit(0);
@@ -54,7 +55,7 @@ u4 divide(struct stack * s, char ** p_string, int pc, map_t ns){
 
 /* ( n1 | u1 n2 | u2 -- n3 | u3 )
  * Add n2 | u2 to n1 | u1, giving the sum n3 | u3. */
-u4 add(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 add(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 2){
     printf("The stack is too small to add. Exiting.\n");
     exit(0);
@@ -69,7 +70,7 @@ u4 add(struct stack * s, char ** p_string, int pc, map_t ns){
 
 /* ( n1 | u1 n2 | u2 -- n3 | u3 )
  * Subtract n2 | u2 from n1 | u1, giving the difference n3 | u3. */
-u4 subtract(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 subtract(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 2){
     printf("The stack is too small to subtract. Exiting.\n");
     exit(0);
@@ -84,7 +85,7 @@ u4 subtract(struct stack * s, char ** p_string, int pc, map_t ns){
 
 /* ( "ccc<quote>" -- )
  * Parse ccc delimited by " (double-quote). Display ccc. */
-u4 print(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 print(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   int idx = pc + 1;
   while(p_string[idx][strlen(p_string[idx]) - 1] != '"')
     printf("%s ", p_string[idx++]);
@@ -95,7 +96,7 @@ u4 print(struct stack * s, char ** p_string, int pc, map_t ns){
 
 /* ( n1 | u1 -- n2 | u2 )
  * Add one (1) to n1 | u1 giving the sum n2 | u2. */
-u4 add_one(struct stack * s, char ** p_string, int pc, map_t ns){
+u4 add_one(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 1){
     printf("The stack is too small to add one. Exiting.\n");
     exit(0);
@@ -106,7 +107,8 @@ u4 add_one(struct stack * s, char ** p_string, int pc, map_t ns){
   return 1;
 }
 
-u4 def(struct stack * s, char ** p_string, int pc, map_t ns){
+/* ( C: "<spaces>name" -- colon-sys ) */
+u4 def(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   int idx = pc + 1;
   char * name = strcat(p_string[idx], "_");
   char * definition = (char *) malloc(1000 * sizeof(char));
@@ -119,6 +121,26 @@ u4 def(struct stack * s, char ** p_string, int pc, map_t ns){
   hashmap_put(ns, name, (any_t) definition);
   idx++;
   return idx - pc;
+}
+
+/* ( x a-addr -- )
+ * Store x at a-addr. */
+u4 store(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
+  if(size(s) < 2){
+    printf("The stack is too small to store a value. Exiting.\n");
+    exit(0);
+  }
+  u8 addr, x;
+  u4 addr_type = pop(s, &addr);
+  u4 x_type = pop(s, &x);
+  if(addr_type == T_i4 || addr_type == T_u4)
+    addr = (u8) ((u4) addr);
+  else if(addr_type == T_i8)
+    addr = (u8) addr;
+  space_store(d_space, (value) {x, x_type}, addr, 1);
+  value v = space_retrieve(d_space, addr);
+  printf("%d : %s\n", CAST(v.v, v.t), TYPE_LABEL(v.t));
+  return 1;
 }
 
 map_t construct_namespace(){
@@ -137,6 +159,8 @@ map_t construct_namespace(){
   error = hashmap_put(core_ns, "1+", &add_one);
   assert(error == MAP_OK);
   error = hashmap_put(core_ns, ":", &def);
+  assert(error == MAP_OK);
+  error = hashmap_put(core_ns, "!", &store);
   assert(error == MAP_OK);
   return core_ns;
 }
