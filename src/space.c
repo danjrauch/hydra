@@ -10,7 +10,7 @@
 
 typedef struct mem_unit {
   value v;
-  u4 status;  /* 0 - free, 1 - one-celled value, 2 - two-celled value */
+  u4 status;
 } mem_unit;
 
 struct space {

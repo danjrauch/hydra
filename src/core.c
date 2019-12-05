@@ -164,7 +164,7 @@ u4 minimum(struct stack * s, struct space * d_space, char ** p_string, int pc, m
 }
 
 /* ( n1 n2 -- n3 )
- * n3 is the lesser of n1 and n2. */
+ * n3 is the greater of n1 and n2. */
 u4 maximum(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   if(size(s) < 2){
     printf("The stack is too small to find a maximum. Exiting.\n");
@@ -173,12 +173,6 @@ u4 maximum(struct stack * s, struct space * d_space, char ** p_string, int pc, m
   u8 a, b;
   u4 a_type = pop(s, &a);
   u4 b_type = pop(s, &b);
-  // printf("a: %lu b: %lu\n", a, b);
-  // printf("MIN: a -> %uu %ds\n", a, CAST(a, a_type));
-  // printf("MIN: b -> %uu %ds\n", b, CAST(b, b_type));
-  // printf("%d\n", (i4) a < (i4) b);
-  // printf("%d\n", CAST(-1, T_i4) == CAST(0, T_i4));
-  // printf("%d\n", CAST(a, a_type) < CAST(b, b_type));
   if(a_type == T_i4 && b_type == T_i4){
     if((i4)CAST(a, a_type) > (i4)CAST(b, b_type))
       push(s, CAST(a, a_type), a_type);
@@ -237,8 +231,25 @@ u4 store(struct stack * s, struct space * d_space, char ** p_string, int pc, map
   else if(addr_type == T_i8)
     addr = (u8) addr;
   space_store(d_space, (value) {x, x_type}, addr, 1);
+  return 1;
+}
+
+/* ( a-addr -- x )
+ * x is the value stored at a-addr. */
+u4 retrieve(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
+  if(size(s) < 1){
+    printf("The stack is too small to retrieve a value. Exiting.\n");
+    exit(0);
+  }
+  u8 addr;
+  u4 addr_type = pop(s, &addr);
+  if(addr_type == T_i4 || addr_type == T_u4)
+    addr = (u8) ((u4) addr);
+  else if(addr_type == T_i8)
+    addr = (u8) addr;
   value v = space_retrieve(d_space, addr);
   printf("%d : %s\n", CAST(v.v, v.t), TYPE_LABEL(v.t));
+  push(s, CAST(v.v, v.t), v.t);
   return 1;
 }
 
@@ -266,6 +277,8 @@ map_t construct_namespace(){
   error = hashmap_put(core_ns, ":", &def);
   assert(error == MAP_OK);
   error = hashmap_put(core_ns, "!", &store);
+  assert(error == MAP_OK);
+  error = hashmap_put(core_ns, "@", &retrieve);
   assert(error == MAP_OK);
   return core_ns;
 }

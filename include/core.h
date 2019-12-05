@@ -27,5 +27,7 @@ u4 minimum(struct stack * s, struct stack * d_space, char ** p_string, int pc, m
 u4 maximum(struct stack * s, struct stack * d_space, char ** p_string, int pc, map_t ns);
 /* ! */
 u4 store(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns);
+/* @ */
+u4 retrieve(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns);
 
 #endif
