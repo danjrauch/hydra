@@ -74,6 +74,7 @@ u4 pop(struct stack * s, void * cont){
       break;
     case T_i4 :
       *((i4 *) cont) = (i4) pop_4(s);
+      // printf("POP_4: %uu %ds\n", *((i4 *) cont), CAST(*((i4 *) cont), T_i4));
       break;
     case T_f4 :
       *((f4 *) cont) = (f4) pop_4(s);
@@ -95,6 +96,7 @@ u4 push_4(struct stack * s, u4 v, u4 t){
   }
   c->prev = s->top;
   c->val = (value) {v, t};
+  // printf("PUSH_4: %uu %ds\n", v, CAST(v, t));
   s->top = c;
   s->size++;
   return 0;
@@ -109,7 +111,7 @@ u4 push(struct stack * s, u8 v, u4 type){
     push_4(s, HIGH_4(v), type);
   }else if(type == T_u4 || type == T_i4 ||
            type == T_f4){
-    push_4(s, v, type);
+    push_4(s, (u4) v, type);
   }else{
     printf("Error pushing to stack. Exiting.\n");
     exit(0);

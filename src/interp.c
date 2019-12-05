@@ -25,7 +25,7 @@ int interp(char * buffer, struct stack * d_stack, struct space * d_space, map_t 
   int i, pc = 0, n_words = 0;
   char * token;
   char ** p_string = (char **) malloc(strlen(buffer) * sizeof(char *));
-  while((token = strtok_r(buffer, " ", &buffer))){
+  while((token = strtok_r(buffer, " \n", &buffer))){
     p_string[pc] = (char *) malloc(strlen(token) * sizeof(char));
     strcpy(p_string[pc], token);
     pc++;
@@ -44,9 +44,9 @@ int interp(char * buffer, struct stack * d_stack, struct space * d_space, map_t 
         interp(definition, d_stack, d_space, ns);
       else{
         if(atol(p_string[pc]) > INT_MAX || atol(p_string[pc]) < INT_MIN)
-          push(d_stack, atol(p_string[pc]), T_i8);
+          push(d_stack, (u8) atol(p_string[pc]), T_i8);
         else
-          push(d_stack, atoi(p_string[pc]), T_i4);
+          push(d_stack, (u8) ((u4) atoi(p_string[pc])), T_i4);
       }
     }
   }

@@ -107,6 +107,105 @@ u4 add_one(struct stack * s, struct space * d_space, char ** p_string, int pc, m
   return 1;
 }
 
+/* ( n1 | u1 -- n2 | u2 )
+ * Subtract one (1) from n1 | u1 giving the difference n2 | u2. */
+u4 subtract_one(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
+  if(size(s) < 1){
+    printf("The stack is too small to subtract one. Exiting.\n");
+    exit(0);
+  }
+  u8 a;
+  u4 a_type = pop(s, &a);
+  push(s, CAST(a,a_type)-1, a_type);
+  return 1;
+}
+
+/* ( n1 n2 -- n3 )
+ * n3 is the lesser of n1 and n2. */
+u4 minimum(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
+  if(size(s) < 2){
+    printf("The stack is too small to find a minimum. Exiting.\n");
+    exit(0);
+  }
+  u8 a, b;
+  u4 a_type = pop(s, &a);
+  u4 b_type = pop(s, &b);
+  // printf("a: %lu b: %lu\n", a, b);
+  // printf("MIN: a -> %uu %ds\n", a, CAST(a, a_type));
+  // printf("MIN: b -> %uu %ds\n", b, CAST(b, b_type));
+  // printf("%d\n", (i4) a < (i4) b);
+  // printf("%d\n", CAST(-1, T_i4) == CAST(0, T_i4));
+  // printf("%d\n", CAST(a, a_type) < CAST(b, b_type));
+  if(a_type == T_i4 && b_type == T_i4){
+    if((i4)CAST(a, a_type) < (i4)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_i8 && b_type == T_i8){
+    if((i8)CAST(a, a_type) < (i8)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_u4 && b_type == T_u4){
+    if((u4)CAST(a, a_type) < (u4)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_u8 && b_type == T_u8){
+    if((u8)CAST(a, a_type) < (u8)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else{
+    printf("The types need to match in order to find a minimum. Exiting.\n");
+    exit(0);
+  }
+  return 1;
+}
+
+/* ( n1 n2 -- n3 )
+ * n3 is the lesser of n1 and n2. */
+u4 maximum(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
+  if(size(s) < 2){
+    printf("The stack is too small to find a maximum. Exiting.\n");
+    exit(0);
+  }
+  u8 a, b;
+  u4 a_type = pop(s, &a);
+  u4 b_type = pop(s, &b);
+  // printf("a: %lu b: %lu\n", a, b);
+  // printf("MIN: a -> %uu %ds\n", a, CAST(a, a_type));
+  // printf("MIN: b -> %uu %ds\n", b, CAST(b, b_type));
+  // printf("%d\n", (i4) a < (i4) b);
+  // printf("%d\n", CAST(-1, T_i4) == CAST(0, T_i4));
+  // printf("%d\n", CAST(a, a_type) < CAST(b, b_type));
+  if(a_type == T_i4 && b_type == T_i4){
+    if((i4)CAST(a, a_type) > (i4)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_i8 && b_type == T_i8){
+    if((i8)CAST(a, a_type) > (i8)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_u4 && b_type == T_u4){
+    if((u4)CAST(a, a_type) > (u4)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else if(a_type == T_u8 && b_type == T_u8){
+    if((u8)CAST(a, a_type) > (u8)CAST(b, b_type))
+      push(s, CAST(a, a_type), a_type);
+    else
+      push(s, CAST(b, b_type), b_type);
+  }else{
+    printf("The types need to match in order to find a minimum. Exiting.\n");
+    exit(0);
+  }
+  return 1;
+}
+
 /* ( C: "<spaces>name" -- colon-sys ) */
 u4 def(struct stack * s, struct space * d_space, char ** p_string, int pc, map_t ns){
   int idx = pc + 1;
@@ -157,6 +256,12 @@ map_t construct_namespace(){
   error = hashmap_put(core_ns, ".\"", &print);
   assert(error == MAP_OK);
   error = hashmap_put(core_ns, "1+", &add_one);
+  assert(error == MAP_OK);
+  error = hashmap_put(core_ns, "1-", &subtract_one);
+  assert(error == MAP_OK);
+  error = hashmap_put(core_ns, "MIN", &minimum);
+  assert(error == MAP_OK);
+  error = hashmap_put(core_ns, "MAX", &maximum);
   assert(error == MAP_OK);
   error = hashmap_put(core_ns, ":", &def);
   assert(error == MAP_OK);
