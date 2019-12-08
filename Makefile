@@ -21,9 +21,9 @@ CFLAGS ?= -c -Iinclude -Wall
 
 # Using Criterion as a test framework
 # https://github.com/Snaipe/Criterion
-$(BUILD_DIR)/$(TEST_EXEC) : EXTRA_FLAGS = -lcriterion
+# $(BUILD_DIR)/$(TEST_EXEC) : EXTRA_FLAGS = -lcriterion
 
-all: $(BUILD_DIR)/$(TARGET_EXEC) $(BUILD_DIR)/$(TEST_EXEC)
+all: $(BUILD_DIR)/$(TARGET_EXEC) # $(BUILD_DIR)/$(TEST_EXEC)
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
